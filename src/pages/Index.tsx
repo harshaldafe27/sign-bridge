@@ -1,14 +1,17 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { useState } from "react";
+import ModeSelector from "@/components/ModeSelector";
+import CommunicationHub from "@/components/CommunicationHub";
+
+type Mode = "deaf" | "hearing" | null;
 
 const Index = () => {
-  return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="mb-4 text-4xl font-bold">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
-      </div>
-    </div>
-  );
+  const [mode, setMode] = useState<Mode>(null);
+
+  if (mode) {
+    return <CommunicationHub mode={mode} onBack={() => setMode(null)} />;
+  }
+
+  return <ModeSelector mode={mode} onSelectMode={setMode} />;
 };
 
 export default Index;
