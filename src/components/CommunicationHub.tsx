@@ -1,10 +1,12 @@
 import { useState, useCallback } from "react";
-import { ArrowLeft, MessageSquare, Settings, Hand, Mic } from "lucide-react";
+import { ArrowLeft, MessageSquare, Hand, Mic, Bot } from "lucide-react";
 import WebcamCapture from "./WebcamCapture";
 import AudioRecorder from "./AudioRecorder";
 import ChatWindow, { type ChatMessage } from "./ChatWindow";
+import AiChatPanel from "./AiChatPanel";
 
 type Mode = "deaf" | "hearing";
+type Tab = "conversation" | "ai";
 
 interface CommunicationHubProps {
   mode: Mode;
@@ -13,6 +15,7 @@ interface CommunicationHubProps {
 
 const CommunicationHub = ({ mode, onBack }: CommunicationHubProps) => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [activeTab, setActiveTab] = useState<Tab>("conversation");
 
   const addMessage = useCallback((text: string, sender: "deaf" | "hearing") => {
     setMessages((prev) => [
@@ -101,17 +104,46 @@ const CommunicationHub = ({ mode, onBack }: CommunicationHubProps) => {
           </div>
         </div>
 
-        {/* Chat Panel */}
+        {/* Right Panel with Tabs */}
         <div className="flex flex-1 flex-col min-h-0">
-          <div className="flex items-center gap-2 border-b border-border px-4 py-3">
-            <MessageSquare className="h-4 w-4 text-muted-foreground" />
-            <h2 className="text-sm font-semibold">Conversation</h2>
-            <span className="ml-auto text-xs text-muted-foreground">
-              {messages.length} messages
-            </span>
+          {/* Tab bar */}
+          <div className="flex border-b border-border">
+            <button
+              onClick={() => setActiveTab("conversation")}
+              className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
+                activeTab === "conversation"
+                  ? "border-primary text-foreground"
+                  : "border-transparent text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              <MessageSquare className="h-4 w-4" />
+              Conversation
+              {messages.length > 0 && (
+                <span className="rounded-full bg-muted px-2 py-0.5 text-xs">
+                  {messages.length}
+                </span>
+              )}
+            </button>
+            <button
+              onClick={() => setActiveTab("ai")}
+              className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
+                activeTab === "ai"
+                  ? "border-primary text-foreground"
+                  : "border-transparent text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              <Bot className="h-4 w-4" />
+              AI Assistant
+            </button>
           </div>
+
+          {/* Tab content */}
           <div className="flex-1 min-h-0 overflow-hidden">
-            <ChatWindow messages={messages} onSpeak={handleSpeak} />
+            {activeTab === "conversation" ? (
+              <ChatWindow messages={messages} onSpeak={handleSpeak} />
+            ) : (
+              <AiChatPanel />
+            )}
           </div>
         </div>
       </div>
